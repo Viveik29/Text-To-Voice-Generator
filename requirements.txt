@@ -1,0 +1,5 @@
+streamlit
+piper-tts
+onnxruntime
+numpy
+gTTS
