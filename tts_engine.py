@@ -17,9 +17,9 @@ AVAILABLE_VOICES: dict[str, str] = {
     "Ryan (US, male)": "en_US-ryan-medium",
     "Alan (British)": "en_GB-alan-medium",
     "Cori (British, female)": "en_GB-cori-medium",
-    # Hindi handled via gTTS fallback
-    "Hindi (Female)": "hi_IN-female",
-    "Hindi (Male)": "hi_IN-male",
+    # Hindi (Indian accent via gTTS tld=co.in)
+    "Hindi Female (Indian accent)": "hi_IN-female",
+    "Hindi Male (Indian accent)": "hi_IN-male",
     # Bhojpuri handled via gTTS fallback
     "Bhojpuri (Male)": "bh_IN-male",
     "Bhojpuri (Female)": "bh_IN-female",
@@ -104,13 +104,17 @@ def synthesize(text: str, voice_id: str, *, speed: float = 1.0, volume: float = 
     """Convert text to speech and save a WAV/MP3 file."""
     cleaned = validate_text(text)
 
-    # Hindi & Bhojpuri fallback via gTTS
+    # Light symbol scrub (also done upstream for narration; keep safe for direct TTS tab use)
+    cleaned = re.sub(r"[#*_>`|\\/\[\]{}<>]", " ", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+
+    # Hindi & Bhojpuri via gTTS — co.in TLD = more Indian Hindi accent
     if voice_id.startswith("hi_IN") or voice_id.startswith("bh_IN"):
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         name = output_name or f"{voice_id}_{uuid.uuid4().hex[:8]}.mp3"
         out_path = OUTPUT_DIR / name
-        # Use Hindi TTS engine for Bhojpuri slang too
-        tts = gTTS(cleaned, lang="hi")
+        # slow=False keeps natural coaching pace; tld co.in improves Indian accent
+        tts = gTTS(cleaned, lang="hi", tld="co.in", slow=False)
         tts.save(str(out_path))
         return out_path
 
@@ -120,7 +124,8 @@ def synthesize(text: str, voice_id: str, *, speed: float = 1.0, volume: float = 
     config = SynthesisConfig(volume=max(0.1, min(2.0, volume)), length_scale=length_scale)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     name = output_name or f"speech_{uuid.uuid4().hex[:8]}.wav"
-    if not name.endswith(".wav"): name += ".wav"
+    if not name.endswith(".wav"):
+        name += ".wav"
     out_path = OUTPUT_DIR / name
     wav_data = _wav_bytes(_split_text(cleaned), voice, config)
     out_path.write_bytes(wav_data)
