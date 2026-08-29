@@ -1,0 +1,13 @@
+services:
+  hindi-voice:
+    build: .
+    container_name: hindi-voice-generator
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./output:/app/output
+    environment:
+      DEFAULT_VOICE: hi-IN-SwaraNeural
+      OUTPUT_FORMAT: wav
+      MAX_CHARS: 50000
+    restart: unless-stopped

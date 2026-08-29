@@ -1,24 +1,59 @@
-"""CLI: generate speech from the command line."""
+"""CLI: generate Hindi speech from text or a .txt file."""
+
+from __future__ import annotations
 
 import argparse
 import sys
-from tts_engine import AVAILABLE_VOICES, synthesize
+
+from tts_engine import AVAILABLE_VOICES, read_text_file, synthesize
+
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate speech with Piper TTS (CPU, offline)")
-    parser.add_argument("text", help="Text to convert to speech")
-    parser.add_argument("-v", "--voice", default="en-US-lessac-medium", choices=list(AVAILABLE_VOICES.values()), help="Voice model ID")
-    parser.add_argument("-o", "--output", default=None, help="Output filename (default: auto)")
-    parser.add_argument("-s", "--speed", type=float, default=1.0, help="Speed multiplier (default: 1.0)")
-    parser.add_argument("--volume", type=float, default=1.0, help="Volume multiplier (default: 1.0)")
+    parser = argparse.ArgumentParser(description="Generate Hindi speech with neural edge-tts voices")
+    parser.add_argument("text", nargs="?", help="Hindi text to convert to speech")
+    parser.add_argument("--file", "-f", help="Path to a UTF-8 .txt file")
+    parser.add_argument(
+        "-v",
+        "--voice",
+        default="hi-IN-SwaraNeural",
+        choices=list(AVAILABLE_VOICES.values()),
+        help="Voice model ID",
+    )
+    parser.add_argument("-o", "--output", default=None, help="Output filename")
+    parser.add_argument("-s", "--speed", type=float, default=1.0, help="Speed multiplier (0.5-2.0)")
+    parser.add_argument(
+        "--format",
+        dest="output_format",
+        default="wav",
+        choices=["wav", "mp3"],
+        help="Output format (default: wav)",
+    )
     args = parser.parse_args()
 
+    if args.file:
+        try:
+            text = read_text_file(args.file)
+        except (ValueError, FileNotFoundError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            sys.exit(1)
+    elif args.text:
+        text = args.text
+    else:
+        parser.error("Provide Hindi text or use --file with a .txt path.")
+
     try:
-        path = synthesize(args.text, args.voice, speed=args.speed, volume=args.volume, output_name=args.output)
-        print(f"✅ Saved: {path}")
-    except (ValueError, RuntimeError, FileNotFoundError) as exc:
-        print(f"❌ Error: {exc}", file=sys.stderr)
+        path = synthesize(
+            text,
+            args.voice,
+            speed=args.speed,
+            output_format=args.output_format,
+            output_name=args.output,
+        )
+        print(f"Saved: {path}")
+    except (ValueError, RuntimeError) as exc:
+        print(f"Error: {exc}", file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

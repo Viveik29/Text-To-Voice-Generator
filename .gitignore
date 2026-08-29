@@ -26,20 +26,11 @@ myenv/
 venv/
 env/
 
-# --- App runtime outputs (regenerated on each run) ---
-artifacts/
+# --- App runtime outputs ---
 output/
-uploads/
-extracted_txt/
 
-# --- Piper TTS models (~60 MB each; auto-downloaded via tts_engine) ---
-voices/*.onnx
-# Keep voices/*.onnx.json — small config files, safe to commit
-
-# --- Local temp / debug dumps (root) ---
+# --- Local temp / debug ---
 _tmp*
-_ocr*
-_png_run_*
 *.log
 
 # --- OS / editor ---
@@ -47,6 +38,3 @@ _png_run_*
 Thumbs.db
 desktop.ini
 .idea/
-
-# --- Optional: uncomment if you don't want editor settings in repo ---
-# .vscode/

@@ -1,11 +1,11 @@
-"""Streamlit UI components and theme."""
+"""Streamlit UI package."""
 
 from ui.components import (
-    render_analysis_results,
-    render_empty_state,
+    render_audio_output,
+    render_generate_button,
     render_header,
+    render_input_panel,
     render_sidebar_settings,
-    render_tts_tab,
 )
 from ui.theme import inject_theme
 
@@ -13,7 +13,7 @@ __all__ = [
     "inject_theme",
     "render_header",
     "render_sidebar_settings",
-    "render_analysis_results",
-    "render_empty_state",
-    "render_tts_tab",
+    "render_input_panel",
+    "render_generate_button",
+    "render_audio_output",
 ]
