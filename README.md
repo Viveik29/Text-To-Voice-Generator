@@ -1,3 +1,5 @@
+![alt text](image.png)
+
 # Hindi Voice Generator
 
 Convert Hindi text into high-quality neural voice audio for YouTube videos. Paste your script in the browser or upload a `.txt` file and export HD WAV or MP3.
